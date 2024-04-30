@@ -1,0 +1,46 @@
+producto mas vendido por cada emplado y el valor recaudado por cada producto
+
+SELECT 	FirstName || " " || LastName as Nombre, 
+		ProductName, max(Quantity) as cantidad, 
+		Price * max(Quantity) as total_vendido  
+FROM Employees e
+JOIN Orders o ON  e.EmployeeID = o.EmployeeID 
+JOIN OrderDetails od ON o.OrderID = od.OrderID 
+JOIN Products p ON od.ProductID = p.ProductID
+GROUP BY o.EmployeeID
+ORDER BY Quantity DESC
+
+-----------------------------------------------------------------
+saber que empleado vendio mas que el promedio
+
+--toda la consulta completa para ver en sqlite
+
+SELECT FirstName || " " || LastName as Nombre, sum(Quantity) as cantidadVendida 
+FROM Orders o, OrderDetails od, Employees e
+WHERE o.OrderID = od.OrderID AND o.EmployeeID = e.EmployeeID
+GROUP BY o.EmployeeID
+HAVING SUM(Quantity) > (
+	SELECT avg(cantidadVendida) FROM (
+	SELECT FirstName, LastName, sum(Quantity) as cantidadVendida 
+	FROM Orders o, OrderDetails od, Employees e
+	WHERE o.OrderID = od.OrderID AND o.EmployeeID = e.EmployeeID
+	GROUP BY o.EmployeeID
+	)
+)
+
+--consulta para calcular solo el promedio de ventas
+
+SELECT avg(cantidadVendida) FROM (
+SELECT FirstName, LastName, sum(Quantity) as cantidadVendida 
+FROM Orders o, OrderDetails od, Employees e
+WHERE o.OrderID = od.OrderID AND o.EmployeeID = e.EmployeeID
+GROUP BY o.EmployeeID
+)
+
+--consulta que trae los nombre y la cantidad vendida
+--consulta utilizada para realizar los calculos con python
+
+SELECT sum(Quantity) as cantidadVendida 
+FROM Orders o, OrderDetails od, Employees e
+WHERE o.OrderID = od.OrderID AND o.EmployeeID = e.EmployeeID
+GROUP BY o.EmployeeID
